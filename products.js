@@ -63,10 +63,12 @@ const init = (connection) => {
 
   const updateCategories = async (productId, categoryIds) => {
     const conn = await connection
+    await conn.query('START TRANSACTION')
     await conn.query('delete from categories_products where product_id = ?', [productId])
     for await (const categoryId of categoryIds) {
       await conn.query('insert into categories_products (category_id, product_id) values (?, ?)', [categoryId, productId])
     }
+    await conn.query('COMMIT') //ROLLBACK
   }
 
   const addImage = async (productId, data) => {
